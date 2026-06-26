@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Compiler — Compile Images to PDF</title>
+    <meta name="description" content="Offline document compiler that gathers photos/images and saves them into a single PDF.">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- ============================================ -->
+    <!-- Header                                       -->
+    <!-- ============================================ -->
+    <header class="app-header">
+        <h1>📄 Document Compiler</h1>
+        <p class="subtitle">Compile photos or scans of pages into a single PDF file</p>
+    </header>
+
+    <!-- ============================================ -->
+    <!-- Main Content                                 -->
+    <!-- ============================================ -->
+    <main class="main-container">
+
+        <!-- ======== Step 1: Upload Images ======== -->
+        <section class="step-card" id="step-upload">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2 class="step-title">Upload Images</h2>
+                <span class="step-complete-badge" id="upload-badge">
+                    ✅ Done
+                </span>
+            </div>
+            <p class="step-description">
+                Select one or more photos of your pages. Supported formats: JPG, JPEG, PNG.
+            </p>
+
+            <!-- Upload Area (click or drag-and-drop) -->
+            <div class="upload-area" id="upload-area">
+                <span class="upload-icon">📸</span>
+                <p class="upload-text">Click here to select images</p>
+                <p class="upload-hint">or drag and drop files here (you can select multiple)</p>
+                <input type="file" 
+                       id="file-input" 
+                       class="file-input" 
+                       accept=".jpg,.jpeg,.png"
+                       multiple
+                       aria-label="Select image files">
+            </div>
+        </section>
+
+        <!-- ======== Step 2: Review Pages ======== -->
+        <section class="step-card disabled" id="step-review">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2 class="step-title">Review Pages</h2>
+                <span class="step-complete-badge" id="review-badge">
+                    ✅ Done
+                </span>
+            </div>
+            <p class="step-description">
+                Review the uploaded pages. You can remove individual pages if needed.
+            </p>
+
+            <!-- Gallery Grid of Thumbnails -->
+            <div class="gallery-container" id="gallery-container">
+                <div class="gallery-grid" id="gallery-grid">
+                    <!-- Dynamic Thumbnails inserted here by JS -->
+                </div>
+                <div class="gallery-footer">
+                    <span id="page-count" class="page-count">0 pages uploaded</span>
+                    <button class="btn-clear-all" id="clear-all-btn">Clear All</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======== Step 3: Name & Generate PDF ======== -->
+        <section class="step-card" id="step-pdf">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2 class="step-title">Name &amp; Download PDF</h2>
+                <span class="step-complete-badge" id="pdf-badge">
+                    ✅ Done
+                </span>
+            </div>
+            <p class="step-description">
+                Give your PDF a title, then generate and download it.
+            </p>
+
+            <!-- Naming Convention Fields -->
+            <div class="naming-fields-container">
+                <div class="form-group">
+                    <label for="pdf-branch-input" class="form-label">Branch Name</label>
+                    <input type="text" 
+                           id="pdf-branch-input" 
+                           class="form-input text-upper" 
+                           placeholder="e.g. ILUSTRE" 
+                           maxlength="50"
+                           aria-label="Branch Name input">
+                </div>
+
+                <div class="form-group">
+                    <label for="pdf-project-input" class="form-label">Project Type</label>
+                    <input type="text" 
+                           id="pdf-project-input" 
+                           class="form-input text-upper" 
+                           placeholder="e.g. JUNE ELECTRIC BILL" 
+                           maxlength="80"
+                           aria-label="Project Type input">
+                </div>
+
+                <div class="form-group">
+                    <label for="pdf-ref-input" class="form-label">Reference Number</label>
+                    <input type="text" 
+                           id="pdf-ref-input" 
+                           class="form-input text-upper" 
+                           placeholder="e.g. 061526-111314-38965896" 
+                           maxlength="50"
+                           aria-label="Reference Number input">
+                </div>
+            </div>
+
+            <!-- Filename Preview Card -->
+            <div class="filename-preview-card">
+                <span class="preview-label">📄 Output PDF Name:</span>
+                <strong id="generated-filename-preview" class="preview-value">Please fill in the details above</strong>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Page Orientation</label>
+                <div class="orientation-selector">
+                    <label class="orientation-option">
+                        <input type="radio" name="orientation" value="portrait" checked>
+                        <span class="orientation-text">Portrait (Upright)</span>
+                    </label>
+                    <label class="orientation-option">
+                        <input type="radio" name="orientation" value="landscape">
+                        <span class="orientation-text">Landscape (Wide)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="preview-pdf-btn" disabled>
+                    <span class="btn-icon">👁️</span>
+                    Preview PDF
+                </button>
+                <button class="btn btn-success" id="pdf-btn" disabled>
+                    <span class="btn-icon">📥</span>
+                    Download PDF
+                </button>
+            </div>
+        </section>
+
+        <!-- ======== Dynamic PDF Preview Area ======== -->
+        <section class="preview-pdf-container" id="preview-pdf-container">
+            <div class="preview-pdf-header">
+                <h3 class="preview-pdf-title">📄 Document Preview</h3>
+                <button class="btn-close-preview" id="close-preview-btn" aria-label="Close PDF preview">✕ Close Preview</button>
+            </div>
+            <iframe class="pdf-preview-iframe" id="pdf-preview-iframe" title="PDF Live Preview"></iframe>
+        </section>
+
+    </main>
+
+    <!-- ============================================ -->
+    <!-- Footer                                       -->
+    <!-- ============================================ -->
+    <footer class="app-footer">
+        <p>Document Compiler — Works completely offline. No internet required.</p>
+    </footer>
+
+    <!-- ============================================ -->
+    <!-- Loading Overlay                              -->
+    <!-- ============================================ -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p class="loading-text" id="loading-text">Generating PDF...</p>
+            <p class="loading-subtext" id="loading-subtext">Compiling all pages together. Please wait.</p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Toast Container                              -->
+    <!-- ============================================ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ============================================ -->
+    <!-- Scripts                                      -->
+    <!-- ============================================ -->
+    <script src="/static/js/app.js"></script>
+
+</body>
+</html>
