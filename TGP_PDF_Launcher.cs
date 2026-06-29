@@ -18,14 +18,58 @@ class Launcher {
         Console.WriteLine("          TGP PDF Maker Launcher");
         Console.WriteLine("==================================================");
 
-        // Check if venv/Scripts/python.exe exists
-        string pythonExePath = "python";
-        string venvPythonPath = Path.Combine(appDir, "venv", "Scripts", "python.exe");
+        string pythonExePath = "";
+        string venvDir = Path.Combine(appDir, "venv");
+        string venvPythonPath = Path.Combine(venvDir, "Scripts", "python.exe");
+
         if (File.Exists(venvPythonPath)) {
             pythonExePath = venvPythonPath;
             Console.WriteLine("Using virtual environment Python: " + pythonExePath);
         } else {
-            Console.WriteLine("Using system Python...");
+            Console.WriteLine("Virtual environment (venv) not found.");
+            Console.WriteLine("Checking system Python for automatic dependency setup...");
+            
+            string sysPython = "";
+            if (CheckCommandExists("python", appDir)) {
+                sysPython = "python";
+            } else if (CheckCommandExists("py", appDir)) {
+                sysPython = "py";
+            }
+
+            if (!string.IsNullOrEmpty(sysPython)) {
+                Console.WriteLine("System Python detected: " + sysPython);
+                Console.WriteLine("Creating local virtual environment (venv) in: " + venvDir);
+                Console.WriteLine("This setup runs only once on the first launch.");
+                Console.WriteLine("Please wait...");
+                Console.WriteLine("--------------------------------------------------");
+                
+                bool venvCreated = RunCommand(sysPython, "-m venv venv", appDir);
+                if (venvCreated && File.Exists(venvPythonPath)) {
+                    Console.WriteLine("--------------------------------------------------");
+                    Console.WriteLine("Virtual environment created successfully.");
+                    Console.WriteLine("Installing required libraries from requirements.txt...");
+                    Console.WriteLine("--------------------------------------------------");
+                    
+                    bool pipInstalled = RunCommand(venvPythonPath, "-m pip install -r requirements.txt", appDir);
+                    Console.WriteLine("--------------------------------------------------");
+                    
+                    if (pipInstalled) {
+                        Console.WriteLine("Dependencies installed successfully!");
+                        pythonExePath = venvPythonPath;
+                    } else {
+                        Console.WriteLine("Warning: Failed to install libraries. Trying global fallback...");
+                    }
+                } else {
+                    Console.WriteLine("Warning: Failed to create virtual environment.");
+                }
+            } else {
+                Console.WriteLine("No system Python detected in PATH.");
+            }
+        }
+
+        if (string.IsNullOrEmpty(pythonExePath)) {
+            pythonExePath = "python";
+            Console.WriteLine("Using system Python fallback...");
         }
 
         Console.WriteLine("Starting Python application (app.py)...");
@@ -67,6 +111,49 @@ class Launcher {
         }
     }
 
+    static bool CheckCommandExists(string command, string workingDir) {
+        try {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = command;
+            startInfo.Arguments = "--version";
+            startInfo.WorkingDirectory = workingDir;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.CreateNoWindow = true;
+            
+            using (Process process = Process.Start(startInfo)) {
+                if (process == null) return false;
+                process.WaitForExit();
+                return process.ExitCode == 0;
+            }
+        }
+        catch {
+            return false;
+        }
+    }
+
+    static bool RunCommand(string fileName, string arguments, string workingDir) {
+        try {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = fileName;
+            startInfo.Arguments = arguments;
+            startInfo.WorkingDirectory = workingDir;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = false;
+            startInfo.RedirectStandardError = false;
+            
+            using (Process process = Process.Start(startInfo)) {
+                if (process == null) return false;
+                process.WaitForExit();
+                return process.ExitCode == 0;
+            }
+        }
+        catch {
+            return false;
+        }
+    }
+
     static void ShowErrorDialog(string errorDetails) {
         MessageBox.Show(
             "Error: Could not launch Python.\n\n" +
@@ -80,3 +167,4 @@ class Launcher {
         );
     }
 }
+
