@@ -90,6 +90,12 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/favicon.ico")
+def favicon():
+    """Serve the application favicon."""
+    return send_file(os.path.join(BASE_DIR, "static", "favicon.ico"), mimetype="image/vnd.microsoft.icon")
+
+
 @app.route("/upload", methods=["POST"])
 def upload_image():
     """
