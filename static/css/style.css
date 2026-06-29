@@ -248,12 +248,38 @@ body {
     box-shadow: var(--shadow-sm);
     border: 2px solid var(--color-border);
     background: var(--color-bg);
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+    cursor: grab;
+    user-select: none;
 }
 
-.gallery-item:hover {
+.gallery-item:active {
+    cursor: grabbing;
+}
+
+.gallery-item:hover:not(.dragging):not(.drag-over) {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+}
+
+/* Drag and Drop visual feedback states */
+.gallery-item.dragging {
+    opacity: 0.4;
+    border-style: dashed;
+    border-color: var(--color-primary);
+    transform: scale(0.95);
+    box-shadow: none;
+}
+
+.gallery-item.drag-over {
+    border-color: var(--color-primary);
+    transform: scale(1.03);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Prevent child elements from intercepting drag events to avoid hover flickering */
+.gallery-grid.dragging-active .gallery-item * {
+    pointer-events: none;
 }
 
 .gallery-image-wrapper {

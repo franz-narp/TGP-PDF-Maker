@@ -255,6 +255,67 @@
             label.className = "gallery-item-name";
             label.textContent = img.originalName;
 
+            // --- Drag & Drop Reordering ---
+            item.setAttribute("draggable", "true");
+            badge.setAttribute("draggable", "false");
+            removeBtn.setAttribute("draggable", "false");
+            wrapper.setAttribute("draggable", "false");
+            controls.setAttribute("draggable", "false");
+            label.setAttribute("draggable", "false");
+
+            item.addEventListener("dragstart", function (e) {
+                item.classList.add("dragging");
+                galleryGrid.classList.add("dragging-active");
+                e.dataTransfer.setData("text/plain", index);
+                e.dataTransfer.effectAllowed = "move";
+                hidePreview();
+            });
+
+            item.addEventListener("dragend", function () {
+                item.classList.remove("dragging");
+                galleryGrid.classList.remove("dragging-active");
+                const items = galleryGrid.querySelectorAll(".gallery-item");
+                items.forEach(function (el) {
+                    el.classList.remove("drag-over");
+                });
+            });
+
+            item.addEventListener("dragover", function (e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+            });
+
+            item.addEventListener("dragenter", function (e) {
+                e.preventDefault();
+                if (!item.classList.contains("dragging")) {
+                    item.classList.add("drag-over");
+                }
+            });
+
+            item.addEventListener("dragleave", function () {
+                item.classList.remove("drag-over");
+            });
+
+            item.addEventListener("drop", function (e) {
+                e.preventDefault();
+                item.classList.remove("drag-over");
+
+                const fromIndexStr = e.dataTransfer.getData("text/plain");
+                const fromIndex = parseInt(fromIndexStr, 10);
+                const toIndex = index;
+
+                if (!isNaN(fromIndex) && fromIndex !== toIndex && fromIndex >= 0 && fromIndex < uploadedImages.length) {
+                    const draggedImg = uploadedImages[fromIndex];
+                    uploadedImages.splice(fromIndex, 1);
+                    uploadedImages.splice(toIndex, 0, draggedImg);
+
+                    hidePreview();
+                    renderGallery();
+                    showToast(`Rearranged: moved page ${fromIndex + 1} to position ${toIndex + 1}`, "info");
+                }
+            });
+            // ------------------------------
+
             item.appendChild(badge);
             item.appendChild(removeBtn);
             item.appendChild(wrapper);
