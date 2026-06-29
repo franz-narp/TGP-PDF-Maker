@@ -278,8 +278,18 @@ def server_error(e):
 
 
 if __name__ == "__main__":
+    import webbrowser
+    import threading
+    import time
+
+    def open_browser():
+        time.sleep(1.5)
+        webbrowser.open("http://127.0.0.1:8000")
+
     print("=" * 50)
     print("  Document Compiler & PDF Generator")
     print("  Open http://localhost:8000 in your browser")
     print("=" * 50)
+    
+    threading.Thread(target=open_browser, daemon=True).start()
     app.run(host="127.0.0.1", port=8000, debug=False)

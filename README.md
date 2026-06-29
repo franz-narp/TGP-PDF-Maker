@@ -30,6 +30,7 @@ Before running this application, you need:
    - ⚠️ During installation, check **"Add Python to PATH"**
 
 2. **Tesseract OCR**
+   - Not yet implemented
    - Download from: https://github.com/UB-Mannheim/tesseract/wiki
    - Install to the default location: `C:\Program Files\Tesseract-OCR\`
    - ⚠️ During installation, make sure **English language data** is selected
@@ -56,6 +57,17 @@ pip install -r requirements.txt
 
 ## ▶️ Running the Application
 
+### Method 1: Double-Click Launcher (Recommended)
+Simply double-click **`TGP_PDF_Launcher.exe`** in the project folder. This will:
+1. Detect and use the Python virtual environment (`venv`) if available, or fall back to system Python.
+2. Start the local server.
+3. Automatically open the application in your default web browser (`http://localhost:8000`).
+
+To stop the application, just close the command console window or press `Ctrl + C`.
+
+---
+
+### Method 2: Manual command-line execution
 ```bash
 # Make sure you're in the project folder
 cd path\to\TGP_PDF
@@ -88,6 +100,8 @@ http://localhost:8000
 
 ```
 TGP_PDF/
+├── TGP_PDF_Launcher.exe    # Double-click launcher to run app
+├── TGP_PDF_Launcher.cs     # C# source code for launcher
 ├── app.py                  # Flask application (main entry point)
 ├── requirements.txt        # Python dependencies
 ├── README.md               # This file
